@@ -15,6 +15,7 @@ import { ParamsDeviceTracker } from '../../../types/ParamsDeviceTracker';
 import { HostItem } from '../../../types/Configuration';
 import { ChannelCode } from '../../../common/ChannelCode';
 import { Tool } from '../../client/Tool';
+import { GridView } from './GridView';
 
 type Field = keyof GoogDeviceDescriptor | ((descriptor: GoogDeviceDescriptor) => string);
 type DescriptionColumn = { title: string; field: Field };
@@ -356,6 +357,35 @@ export class DeviceTracker extends BaseDeviceTracker<GoogDeviceDescriptor, never
             const holder = document.getElementById(BaseDeviceTracker.HOLDER_ELEMENT_ID);
             if (holder && holder.parentElement) {
                 holder.parentElement.removeChild(holder);
+            }
+        }
+    }
+
+    protected buildDeviceTable(): void {
+        super.buildDeviceTable();
+        
+        // Add Mirror All button if there are connected devices
+        const connectedDevices = this.descriptors.filter(device => device.state === 'device');
+        if (connectedDevices.length > 1) {
+            // Initialize GridView with current params
+            GridView.initialize(this.params);
+            
+            // Create and add the Mirror All button
+            const mirrorAllButton = GridView.createMirrorAllButton(this.descriptors);
+            const devicesElement = document.getElementById('devices');
+            if (devicesElement) {
+                // Insert button before the device list
+                const deviceListElement = devicesElement.querySelector('.device-list');
+                if (deviceListElement) {
+                    // Remove any existing Mirror All button first to avoid duplicates
+                    const existingButton = devicesElement.querySelector('.mirror-all-button');
+                    if (existingButton) {
+                        existingButton.remove();
+                    }
+                    devicesElement.insertBefore(mirrorAllButton, deviceListElement);
+                } else {
+                    devicesElement.appendChild(mirrorAllButton);
+                }
             }
         }
     }
