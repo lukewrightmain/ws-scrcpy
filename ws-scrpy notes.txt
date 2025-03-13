@@ -1,0 +1,17 @@
+The ESLint error is because ESLint v9 (which we just updated to) uses a new configuration system that requires an eslint.config.js file instead of the old .eslintrc.* and .eslintignore files. This is a breaking change in ESLint v9, but it doesn't affect the actual functionality of the application - it only affects the linting process.
+
+That ESLint error is occurring because we updated to ESLint v9, which uses a completely new configuration format. ESLint v9 no longer supports the .eslintrc.* files or .eslintignore files - instead, it requires an eslint.config.js file.
+
+The good news is:
+
+It doesn't affect your application's functionality at all
+The webpack build still works perfectly
+Your app runs normally
+To fix the ESLint configuration, you have two options:
+
+Downgrade ESLint to v8:
+CopyInsert
+npm install eslint@^8.12.0 --save-dev
+Migrate the ESLint config to the new format: This would involve creating an eslint.config.js file following the migration guide: https://eslint.org/docs/latest/use/configure/migration-guide
+
+
