@@ -32,7 +32,7 @@ export abstract class Mw {
         this.ws.addEventListener('close', this.onSocketClose.bind(this));
     }
 
-    protected abstract onSocketMessage(event: WS.MessageEvent): void;
+    protected abstract onSocketMessage(event: MessageEvent | WS.MessageEvent): void;
 
     protected sendMessage = (data: Message): void => {
         if (this.ws.readyState !== this.ws.OPEN) {

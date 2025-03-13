@@ -8,7 +8,7 @@ export interface ProcessRunnerEvents {
     started: boolean;
     stdout: string;
     stderr: string;
-    close: { code: number; signal: string };
+    close: { code: number; signal: string | null };
     exit: { code: number | null; signal: string | null };
     error: Error;
 }
@@ -46,16 +46,16 @@ export abstract class ProcessRunner<T extends ProcessRunnerEvents> extends Typed
             this.emit('spawned', true);
         });
 
-        this.proc.on('exit', (code, signal) => {
+        this.proc.on('exit', (code: number | null, signal: string | null) => {
             this.emit('exit', { code, signal });
         });
 
-        this.proc.on('error', (error) => {
+        this.proc.on('error', (error: Error) => {
             console.error(this.name, `failed to spawn process.\n${error.stack}`);
             this.emit('error', error);
         });
 
-        this.proc.on('close', (code, signal) => {
+        this.proc.on('close', (code: number, signal: string | null) => {
             this.emit('close', { code, signal });
         });
     }

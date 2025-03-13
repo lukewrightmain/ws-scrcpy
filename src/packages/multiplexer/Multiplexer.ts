@@ -254,9 +254,26 @@ export class Multiplexer extends TypedEmitter<MultiplexerEvents> implements WebS
     public send(data: string | ArrayBufferLike | Blob | ArrayBufferView): void {
         if (this.ws instanceof Multiplexer) {
             if (typeof data === 'string') {
-                data = Message.createBuffer(MessageType.RawStringData, this._id, Buffer.from(data));
+                // Convert string to Uint8Array using TextEncoder
+                const encoder = new TextEncoder();
+                const uint8Array = encoder.encode(data);
+                data = Message.createBuffer(MessageType.RawStringData, this._id, uint8Array);
             } else {
-                data = Message.createBuffer(MessageType.RawBinaryData, this._id, Buffer.from(data));
+                // Convert various buffer types to Uint8Array
+                let uint8Array: Uint8Array;
+                if (data instanceof ArrayBuffer) {
+                    uint8Array = new Uint8Array(data);
+                } else if (ArrayBuffer.isView(data)) {
+                    uint8Array = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+                } else if (data instanceof Blob) {
+                    // For Blob we'll have to handle it asynchronously, but synchronous API expected
+                    // This is a fallback that may not work in all cases
+                    uint8Array = new Uint8Array(0);
+                    console.warn('Blob conversion in send() may not be fully supported');
+                } else {
+                    uint8Array = new Uint8Array(0);
+                }
+                data = Message.createBuffer(MessageType.RawBinaryData, this._id, uint8Array);
             }
         }
         this._send(data);
@@ -264,7 +281,24 @@ export class Multiplexer extends TypedEmitter<MultiplexerEvents> implements WebS
 
     public sendData(data: string | ArrayBufferLike | Blob | ArrayBufferView): void {
         if (this.ws instanceof Multiplexer) {
-            data = Message.createBuffer(MessageType.Data, this._id, Buffer.from(data));
+            // Convert various data types to Uint8Array
+            let uint8Array: Uint8Array;
+            if (typeof data === 'string') {
+                const encoder = new TextEncoder();
+                uint8Array = encoder.encode(data);
+            } else if (data instanceof ArrayBuffer) {
+                uint8Array = new Uint8Array(data);
+            } else if (ArrayBuffer.isView(data)) {
+                uint8Array = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+            } else if (data instanceof Blob) {
+                // For Blob we'll have to handle it asynchronously, but synchronous API expected
+                // This is a fallback that may not work in all cases
+                uint8Array = new Uint8Array(0);
+                console.warn('Blob conversion in sendData() may not be fully supported');
+            } else {
+                uint8Array = new Uint8Array(0);
+            }
+            data = Message.createBuffer(MessageType.Data, this._id, uint8Array);
         }
         this._send(data);
     }

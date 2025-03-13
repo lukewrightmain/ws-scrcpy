@@ -1,11 +1,12 @@
 import { Event2 } from './Event';
 
-export class MessageEvent2 extends Event2 implements MessageEvent {
+export class MessageEvent2 extends Event2 {
     public readonly data: any;
     public readonly origin: string;
     public readonly lastEventId: string;
-    public readonly source: any;
-    public readonly ports: ReadonlyArray<any>;
+    public readonly source: MessageEventSource | null;
+    public readonly ports: ReadonlyArray<MessagePort>;
+    
     constructor(
         type: string,
         { data = null, origin = '', lastEventId = '', source = null, ports = [] }: MessageEventInit = {},
@@ -18,8 +19,18 @@ export class MessageEvent2 extends Event2 implements MessageEvent {
         this.ports = [...ports];
     }
 
-    initMessageEvent(): void {
-        throw Error('Deprecated method');
+    // Prefix unused parameters with underscore to indicate they're intentionally unused
+    initMessageEvent(
+        _type: string,
+        _bubbles?: boolean,
+        _cancelable?: boolean,
+        _data?: any,
+        _origin?: string,
+        _lastEventId?: string,
+        _source?: MessageEventSource | null,
+        _ports?: MessagePort[],
+    ): void {
+        throw new Error('Deprecated method');
     }
 }
 

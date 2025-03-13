@@ -1,8 +1,9 @@
 export class Event2 {
-    static NONE = 0;
-    static CAPTURING_PHASE = 1;
-    static AT_TARGET = 2;
-    static BUBBLING_PHASE = 3;
+    // Static constants need to be literal numbers for TypeScript 5.8 compatibility
+    static readonly NONE = 0;
+    static readonly CAPTURING_PHASE = 1;
+    static readonly AT_TARGET = 2;
+    static readonly BUBBLING_PHASE = 3;
 
     public cancelable: boolean;
     public bubbles: boolean;
@@ -10,12 +11,17 @@ export class Event2 {
     public type: string;
     public defaultPrevented: boolean;
     public timeStamp: number;
-    public target: any;
+    public target: EventTarget | null;
     public readonly isTrusted: boolean = true;
-    readonly AT_TARGET: number = 0;
-    readonly BUBBLING_PHASE: number = 0;
-    readonly CAPTURING_PHASE: number = 0;
-    readonly NONE: number = 0;
+    
+    // Instance constants must be literal numbers for TypeScript 5.8
+    readonly AT_TARGET: 2 = 2;
+    readonly BUBBLING_PHASE: 3 = 3;
+    readonly CAPTURING_PHASE: 1 = 1;
+    readonly NONE: 0 = 0;
+    
+    // Typed as EventTarget to match DOM Event interface
+    public currentTarget: EventTarget | null = null;
 
     constructor(type: string, options = { cancelable: true, bubbles: true, composed: false }) {
         const { cancelable, bubbles, composed } = { ...options };
@@ -28,42 +34,45 @@ export class Event2 {
         this.target = null;
     }
 
-    stopImmediatePropagation() {
+    stopImmediatePropagation(): void {
         // this[kStop] = true;
     }
 
-    preventDefault() {
+    preventDefault(): void {
         this.defaultPrevented = true;
     }
 
-    get currentTarget() {
-        return this.target;
-    }
-    get srcElement() {
+    get srcElement(): EventTarget | null {
         return this.target;
     }
 
-    composedPath() {
+    composedPath(): EventTarget[] {
         return this.target ? [this.target] : [];
     }
-    get returnValue() {
+    
+    get returnValue(): boolean {
         return !this.defaultPrevented;
     }
-    get eventPhase() {
-        return this.target ? Event.AT_TARGET : Event.NONE;
+    
+    get eventPhase(): 0 | 1 | 2 | 3 {
+        return this.target ? Event2.AT_TARGET : Event2.NONE;
     }
-    get cancelBubble() {
+    
+    get cancelBubble(): boolean {
         return false;
         // return this.propagationStopped;
     }
-    set cancelBubble(value: any) {
+    
+    set cancelBubble(value: boolean) {
         if (value) {
             this.stopPropagation();
         }
     }
-    stopPropagation() {
+    
+    stopPropagation(): void {
         // this.propagationStopped = true;
     }
+    
     initEvent(type: string, bubbles?: boolean, cancelable?: boolean): void {
         this.type = type;
         if (arguments.length > 1) {

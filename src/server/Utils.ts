@@ -20,17 +20,19 @@ export class Utils {
         Object.keys(os.networkInterfaces())
             .map((key) => os.networkInterfaces()[key])
             .forEach((info) => {
-                info.forEach((iface) => {
-                    let scopeid: number | undefined;
-                    if (iface.family === 'IPv6') {
-                        scopeid = iface.scopeid;
-                    } else if (iface.family === 'IPv4') {
-                        scopeid = undefined;
-                    } else {
-                        return;
-                    }
-                    formatAddress(iface.address, scopeid);
-                });
+                if (info) {
+                    info.forEach((iface) => {
+                        let scopeid: number | undefined;
+                        if (iface.family === 'IPv6') {
+                            scopeid = iface.scopeid;
+                        } else if (iface.family === 'IPv4') {
+                            scopeid = undefined;
+                        } else {
+                            return;
+                        }
+                        formatAddress(iface.address, scopeid);
+                    });
+                }
             });
         const nameList = [
             encodeURI(`${proto}://${os.hostname()}:${port}${pathname}`),
