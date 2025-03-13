@@ -74,7 +74,9 @@ export class ShellClient extends ManagerClient<ParamsShell, never> {
         if (!udid || !this.ws || this.ws.readyState !== this.ws.OPEN) {
             return;
         }
-        const { rows, cols } = this.fitAddon.proposeDimensions();
+        const dimensions = this.fitAddon.proposeDimensions();
+        const rows = dimensions?.rows || 24; 
+        const cols = dimensions?.cols || 80; 
         const message: MessageXtermClient = {
             id: 1,
             type: 'shell',
@@ -100,10 +102,11 @@ export class ShellClient extends ManagerClient<ParamsShell, never> {
     }
 
     private updateTerminalSize(): void {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const term: any = this.term;
         const terminalContainer: HTMLElement = ShellClient.getOrCreateContainer(this.escapedUdid);
-        const { rows, cols } = this.fitAddon.proposeDimensions();
+        const dimensions = this.fitAddon.proposeDimensions();
+        const rows = dimensions?.rows || 24; 
+        const cols = dimensions?.cols || 80; 
         const width =
             (cols * term._core._renderService.dimensions.actualCellWidth + term._core.viewport.scrollBarWidth).toFixed(
                 2,
