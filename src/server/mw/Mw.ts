@@ -26,10 +26,11 @@ export abstract class Mw {
     }
 
     protected constructor(protected readonly ws: WS | Multiplexer) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        this.ws.addEventListener('message', this.onSocketMessage.bind(this));
-        this.ws.addEventListener('close', this.onSocketClose.bind(this));
+        // We need to handle both WebSocket and Multiplexer with compatible event handling
+        // Use type assertion to satisfy TypeScript while preserving the existing behavior
+        const wsAny = this.ws as any;
+        wsAny.addEventListener('message', this.onSocketMessage.bind(this));
+        wsAny.addEventListener('close', this.onSocketClose.bind(this));
     }
 
     protected abstract onSocketMessage(event: MessageEvent | WS.MessageEvent): void;
@@ -41,7 +42,8 @@ export abstract class Mw {
         this.ws.send(JSON.stringify(data));
     };
 
-    protected onSocketClose(): void {
+    // Using a parameter to accommodate both CloseEvent types
+    protected onSocketClose(_event?: CloseEvent | WS.CloseEvent): void {
         this.release();
     }
 
