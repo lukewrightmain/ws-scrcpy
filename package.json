@@ -71,6 +71,6 @@
     "xterm-addon-fit": "^0.8.0"
   },
   "optionalDependencies": {
-    "appium-xcuitest-driver": "^8.4.0"
+    "appium-xcuitest-driver": "^8.4.2"
   }
 }
